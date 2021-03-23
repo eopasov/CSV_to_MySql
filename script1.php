@@ -57,26 +57,23 @@ else {
 
 
 //работа с csv файлом
-
     $row = 0;
     $sql = "";
     if (($handle = fopen($uploadfile, "r")) !== FALSE) {
         while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
             $row++;
-            $sql = mysqli_query($link, "INSERT INTO `test` SET
-                `surname` = '$data[0]',
-                `name` = '$data[1]',
-                `phone` = '$data[2]';
-               
-              ");
+            $query = "INSERT INTO test (surname, name, phone) VALUES (?,?,?)";
+            $stmt = mysqli_prepare($link, $query);
 
+            mysqli_stmt_bind_param($stmt, "sss", $data[0], $data[1], $data[2]);
+            $stmt->execute();
+            $stmt->close();
         }
-        if ($sql) {
-            echo "data uploaded successfully ";
+
+            echo "Данные из файла были внесены в базу данных ";
             echo "<br />\n";
             echo '<a href="script2.php">Показать данные в виде таблицы</a>';
 
-    }
         fclose($handle);
         echo "<br />\n";
         echo "Количество внесенных строк в таблицу = " . $row;
